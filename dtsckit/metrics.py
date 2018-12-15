@@ -24,33 +24,20 @@ class AverageKeeper(object):
         self.n = 0
 
 
-def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
+def softmax_pred(linear_out):
+    """Apply softmax and get the predictions
+
+    Parameters
+    ----------
+    linear_out: torch.Tensor
+        The tensor output of the pytorch nn model. Assumes 2D, stacked vectors
+
+    Returns
+    -------
+    A numpy array of the argmax for each vector
     """
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
-    """
-    if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-        print("Normalized confusion matrix")
-    else:
-        print('Confusion matrix, without normalization')
-
-    print(cm)
-
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
-    plt.yticks(tick_marks, classes)
-
-    fmt = '.2f' if normalize else 'd'
-    thresh = cm.max() / 2.
-    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
-
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-    plt.tight_layout()
+    with torch.no_grad():
+        softmax_out = nn.Softmax(dim=1)(linear_out)
+        pred = torch.argmax(softmax_out, dim=1)
+        pred = pred.squeeze()
+        return pred.numpy()
