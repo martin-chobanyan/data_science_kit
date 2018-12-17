@@ -6,6 +6,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
+import torch
+import torch.nn as nn
+
 
 class AverageKeeper(object):
     """
@@ -23,7 +26,7 @@ class AverageKeeper(object):
         self.sum = 0
         self.n = 0
 
-
+# TODO move this to model.py
 def softmax_pred(linear_out):
     """Apply softmax and get the predictions
 
@@ -36,8 +39,7 @@ def softmax_pred(linear_out):
     -------
     A numpy array of the argmax for each vector
     """
-    with torch.no_grad():
-        softmax_out = nn.Softmax(dim=1)(linear_out)
-        pred = torch.argmax(softmax_out, dim=1)
-        pred = pred.squeeze()
-        return pred.numpy()
+    softmax_out = nn.Softmax(dim=1)(linear_out)
+    pred = torch.argmax(softmax_out, dim=1)
+    pred = pred.squeeze()
+    return pred.numpy()
