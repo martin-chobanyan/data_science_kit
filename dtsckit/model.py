@@ -84,40 +84,43 @@ def validate_epoch(epoch, model, dataloader, criterion, device, print_rate=50):
     return loss_avg.calculate()
 
 
-# TODO: patch this up so that it works...
 def early_stop(train_loader, eval_loader, model, optimizer, criterion,
-               maxepochs, device, n=1, patience=3):
+               device, maxepochs=500, check=1, patience=5):
 
-    epoch_i = 0
-    patience_i = 0
+    epoch = 0
+    p = 0
     best_validation_loss = float('inf')
-    stop = 0
+    stop_epoch = 0
+
+    training_losses = []
+    validation_losses = []
 
     # while the validation loss has not consistently increased
-    while patience_i < patience:
+    while p < patience:
 
-        # train the model for n steps
-        for i in range(n):
+        # train the model for check steps
+        for i in range(check):
 
-            if epoch_i == maxepochs:
-                return stop
+            if epoch == maxepochs:
+                return stop_epoch, training_losses, validation_losses
 
-            train(epoch_i, train_loader, model, optimizer, criterion, device)
-            epoch_i += 1
+            training_loss = train_epoch(epoch, model, train_loader, criterion, optimizer, device)
+            training_losses.append(training_loss)
+            epoch += 1
 
         # get the validation loss
-        validation_loss = validate(epoch_i, eval_loader, model, criterion, device)
+        validation_loss = validate_epoch(epoch, model, eval_loader, criterion, device)
+        validation_losses.append(validation_loss)
 
         if validation_loss < best_validation_loss:
 
-            patience_i = 0
+            p = 0
             best_validation_loss = validation_loss
 
             # save the model and update the stopping epoch
-            checkpoint(args.outputfolder, epoch_i, model, best_validation_loss)
-            stop = epoch_i
+            stop_epoch = epoch
 
         else:
-            patience_i += 1
+            p += 1
 
-    return stop
+    return stop_epoch, training_losses, validation_losses

@@ -23,7 +23,7 @@ def reset_plot_size():
 
 
 def scatter_categorical(data, labels, color_map, dim=2, plot_size=(12,8), alpha=0.6):
-	"""Scatter plot categorical data in two or three dimensions
+    """Scatter plot categorical data in two or three dimensions
 
 	Parameters
 	----------
