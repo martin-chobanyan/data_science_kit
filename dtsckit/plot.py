@@ -5,6 +5,8 @@ from itertools import chain, product
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import torch
+from torchvision.transforms import ToPILImage
 
 
 def set_plot_size(*new_size):
@@ -61,9 +63,9 @@ def scatter_categorical(data, labels, color_map, dim=2, plot_size=(12,8), alpha=
                        label=label,
                        alpha=alpha)
         elif dim == 3:
-            ax.scatter(x[label_idx],
-                       y[label_idx],
-                       z[label_idx],
+            ax.scatter(data[label_idx, 0],
+                       data[label_idx, 1],
+                       data[label_idx, 2],
                        c=color_map[label],
                        label=label,
                        alpha=alpha)
