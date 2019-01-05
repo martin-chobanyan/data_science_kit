@@ -82,7 +82,7 @@ def display_images(images, grid_shape, plot_size=(6, 4)):
     images = chain([img.squeeze() for img in images], [None for _ in range(n_leftover_axes)])
     for ax, img in zip(axes, images):
         if img is not None:
-            ax.imshow(ToPILImage()(img.unsqueeze(0)))
+            ax.imshow(ToPILImage()(img))
         ax.axis('off')
     plt.show()
     reset_plot_size()

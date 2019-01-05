@@ -18,17 +18,19 @@ def train_epoch(epoch, model, dataloader, criterion, optimizer, device, print_ra
         The dataloader that will shuffle and batch the dataset
     criterion: nn.Module/callable
         The loss criterion for the model
-    optimizer: torch.optim.Optimizer
+    optimizer: pytorch Optimizer
         The optimizer for this model
     device: torch.device
         The device for where the model will be trained
     print_rate: int
-        The number of batches to print the status update (default=50)
+        The number of batches to print the status update. If -1 nothing will be printed (default=50)
     """
-    print('----------------------')
-    print(f'Training epoch {epoch}')
-    print('----------------------')
-    print('Batch\tAverage Loss')
+    print_stats = (print_rate != -1)
+    if print_stats:
+        print('----------------------')
+        print(f'Training epoch {epoch}')
+        print('----------------------')
+        print('Batch\tAverage Loss')
     loss_avg = AverageKeeper()
     model = model.train()
     for i, batch in enumerate(dataloader):
@@ -41,9 +43,8 @@ def train_epoch(epoch, model, dataloader, criterion, optimizer, device, print_ra
         optimizer.step()
 
         loss_avg.add(loss.detach().item())
-        if i % print_rate == 0:
+        if print_stats and i % print_rate == 0:
             print(f'{i}\t{round(loss_avg.calculate(), 6)}')
-
     return loss_avg.calculate()
 
 
@@ -63,12 +64,14 @@ def validate_epoch(epoch, model, dataloader, criterion, device, print_rate=50):
     device: torch.device
         The device for where the model will be trained
     print_rate: int
-        The number of batches to print the status update (default=50)
+        The number of batches to print the status update. If -1 nothing will be printed (default=50)
     """
-    print('----------------------')
-    print(f'Validation epoch {epoch}')
-    print('----------------------')
-    print('Batch\tAverage Loss')
+    print_stats = (print_rate != -1)
+    if print_stats:
+        print('----------------------')
+        print(f'Validation epoch {epoch}')
+        print('----------------------')
+        print('Batch\tAverage Loss')
     loss_avg = AverageKeeper()
     model = model.eval()
     with torch.no_grad():
@@ -78,14 +81,13 @@ def validate_epoch(epoch, model, dataloader, criterion, device, print_rate=50):
             out = model(images)
             loss = criterion(out, breeds)
             loss_avg.add(loss.detach().item())
-            if i % print_rate == 0:
+            if print_stats and i % print_rate == 0:
                 print(f'{i}\t{round(loss_avg.calculate(), 6)}')
-
     return loss_avg.calculate()
 
 
-def early_stop(train_loader, eval_loader, model, optimizer, criterion,
-               device, maxepochs=500, check=1, patience=5):
+def early_stop(train_loader, eval_loader, model, optimizer, criterion, device,
+               print_rate=50, maxepochs=500, check=1, patience=5):
 
     epoch = 0
     p = 0
@@ -104,12 +106,12 @@ def early_stop(train_loader, eval_loader, model, optimizer, criterion,
             if epoch == maxepochs:
                 return stop_epoch, training_losses, validation_losses
 
-            training_loss = train_epoch(epoch, model, train_loader, criterion, optimizer, device)
+            training_loss = train_epoch(epoch, model, train_loader, criterion, optimizer, device, print_rate)
             training_losses.append(training_loss)
             epoch += 1
 
         # get the validation loss
-        validation_loss = validate_epoch(epoch, model, eval_loader, criterion, device)
+        validation_loss = validate_epoch(epoch, model, eval_loader, criterion, device, print_rate)
         validation_losses.append(validation_loss)
 
         if validation_loss < best_validation_loss:
