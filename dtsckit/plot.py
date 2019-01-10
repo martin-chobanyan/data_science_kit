@@ -74,11 +74,10 @@ def scatter_categorical(data, labels, color_map, dim=2, plot_size=(12,8), alpha=
     reset_plot_size()
 
 
-# display tensors as images using ToPILImage...
 # this should maybe be changed to be more general or wrapped by another function
 def display_images(images, grid_shape, plot_size=(6, 4)):
     """Plot images of pytorch tensors
-    
+
     Parameters
     ----------
     images: Tensor, list(Tensor)
@@ -91,8 +90,13 @@ def display_images(images, grid_shape, plot_size=(6, 4)):
     set_plot_size(*plot_size)
     fig, axes = plt.subplots(*grid_shape)
     axes = axes.reshape(-1)
-    n_leftover_axes = len(axes)-len(images)
-    images = chain([img.squeeze() for img in images], [None for _ in range(n_leftover_axes)])
+    n_leftover_axes = len(axes) - len(images)
+
+    # if there is an extra dimension then remove it
+    if len(images[0].size()) == 4:
+        images = [images.squeeze() for img in images]
+
+    images = chain(images, [None]*n_leftover_axes)
     for ax, img in zip(axes, images):
         if img is not None:
             ax.imshow(ToPILImage()(img))

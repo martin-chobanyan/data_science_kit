@@ -126,3 +126,20 @@ def early_stop(train_loader, eval_loader, model, optimizer, criterion, device,
             p += 1
 
     return stop_epoch, training_losses, validation_losses
+
+
+def checkpoint(model, filepath):
+    """Save the state of the model
+
+    To restore the model do the following:
+    >> the_model = TheModelClass(*args, **kwargs)
+    >> the_model.load_state_dict(torch.load(PATH))
+
+    Parameters
+    ----------
+    model: nn.Module
+        The pytorch model to be saved
+    filepath: str
+        The filepath of the pickle
+    """
+    torch.save(model.state_dict(), filepath)
