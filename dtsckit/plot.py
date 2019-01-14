@@ -8,6 +8,26 @@ from mpl_toolkits.mplot3d import Axes3D
 import torch
 from torchvision.transforms import ToPILImage
 
+#############################################
+################ CLASSES ####################
+#############################################
+
+class ParameterVisualizer(object):
+    def __init__(self, model):
+        # also save the names of each layer from model.modules()...
+        self.params = list(model.parameters())
+    def view_params(self, layer, all_layers=False):
+        if all_layers:
+            pass
+        return  # display histogram of features
+    def min(self, layer, all_layers=False):
+        return
+    def max(self, layer, all_layers=False):
+        return
+
+#############################################
+############### FUNCTIONS ###################
+#############################################
 
 def set_plot_size(*new_size):
     """Set the plot size to the given dimensions
