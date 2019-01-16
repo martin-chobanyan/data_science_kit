@@ -89,7 +89,38 @@ def validate_epoch(epoch, model, dataloader, criterion, device, print_rate=50):
 
 def early_stop(train_loader, eval_loader, model, optimizer, criterion, device,
                print_rate=50, maxepochs=500, check=1, patience=5):
+    """Train with early stopping
 
+    An early stopping implementation using the 'train' and 'validate' functions.
+    As the model trains, a validation epoch is run every 'check' number of epochs.
+    If a new min validation loss is not achieved within 'patience' number of checks, then the model will
+    stop training  and return the latest epoch along with the recorded training and validation losses.
+
+    Parameters
+    ----------
+    train_loader: DataLoader
+        The data loader for the training instances
+    eval_loader: DataLoader
+        The data loader for the validation instances
+    model: nn.Module
+        The neural network module
+    optimizer: nn.optim
+        The optimizer associated with the model
+    criterion: nn.Module
+        The loss criterion associated for the model
+    device: torch.device
+        The device where the model will train
+    maxepochs: int
+        The maximum number of epochs the model can train (default=args.maxepochs)
+    check: int
+        The number of epochs that must pass to periodically check the validation loss (default=1)
+    patience: int
+        The number of times that the validation can avoid not reaching a new minimum (default=5)
+
+    Returns
+    -------
+    A tuple of the stopping epoch number, training losses (list(float)), and validation losses (list(float))
+    """
     epoch = 0
     p = 0
     best_validation_loss = float('inf')
