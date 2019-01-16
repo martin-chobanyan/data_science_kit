@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import torch
+from torch.utils.data import random_split
 from dtsckit.metrics import AverageKeeper
 
 
@@ -143,3 +144,17 @@ def checkpoint(model, filepath):
         The filepath of the pickle
     """
     torch.save(model.state_dict(), filepath)
+
+
+def create_training_fold(dataset, k=5):
+    """Split the dataset into training and validation
+
+    Parameters
+    ----------
+    dataset: torch.utils.data.Dataset
+        A pytorch Dataset representing the full training set
+    k: int
+        The number of folds in the k-fold cross validation (default=5)
+    """
+    n_validation = int((1/k) * len(dataset))
+    return random_split(dataset, [len(dataset)-n_validation, n_validation])

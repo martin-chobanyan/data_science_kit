@@ -75,6 +75,7 @@ def scatter_categorical(data, labels, color_map, dim=2, plot_size=(12,8), alpha=
 
 
 # this should maybe be changed to be more general or wrapped by another function
+# TODO: maybe use torchvision.utils.make_grid for the pytorch case and wrap it with a more generic caller
 def display_images(images, grid_shape, plot_size=(6, 4)):
     """Plot images of pytorch tensors
 
@@ -113,7 +114,6 @@ def compare_feature_maps(image, model, device, grid_shape,
         print(title)
         image = image.to(device)
         output = model(image.unsqueeze(0))
-        test_image = image.squeeze().cpu()
 
         # set up the plot figure
         fig, axes = plt.subplots(*grid_shape)
