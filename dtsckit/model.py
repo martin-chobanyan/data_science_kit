@@ -160,6 +160,26 @@ def early_stop(train_loader, eval_loader, model, optimizer, criterion, device,
     return stop_epoch, training_losses, validation_losses
 
 
+def num_params(model, trainable=False):
+    """Get the number of parameters in the model
+
+    Parameters
+    ----------
+    model: nn.Module
+        The target pytorch model
+    trainable: bool
+        If True then ignore parameters that cannot train
+
+    Returns
+    -------
+    The total int number of parameters in the neural network.
+    """
+    if trainable:
+        return sum(p.numel() for p in model.parameters() if p.requires_grad)
+    else:
+        return sum(p.numel() for p in model.parameters())
+
+
 def checkpoint(model, filepath):
     """Save the state of the model
 

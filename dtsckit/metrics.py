@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import itertools
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix
-
 import torch
 import torch.nn as nn
 
@@ -17,19 +13,35 @@ class AverageKeeper(object):
     def __init__(self):
         self.sum = 0
         self.n = 0
+        self.running_avg = []
+
     def add(self, x):
+        """Update the current running sum"""
         self.sum += x
         self.n += 1
+
     def calculate(self):
-        return self.sum / self.n if self.n != 0 else 0
-    def reset(self):
+        """Calculate the current average and append to the running average"""
+        avg = self.sum / self.n if self.n != 0 else 0
+        self.running_avg.append(avg)
+        return avg
+
+    def reset(self, complete=False):
+        """Reset the average counter
+
+        Parameters
+        ----------
+        complete: bool
+            If complete is True, then the running average will be reset as well
+        """
         self.sum = 0
         self.n = 0
+        if complete:
+            self.running_avg = []
 
-
-#####################################
-######PYTORCH HELPER FUNCTIONS#######
-#####################################
+# ------------------------------------
+#       PYTORCH HELPER FUNCTIONS
+# ------------------------------------
 
 
 # TODO move this to model.py

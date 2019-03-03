@@ -4,30 +4,36 @@
 from itertools import chain, product
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import torch
 from torchvision.transforms import ToPILImage
 
-#############################################
-################ CLASSES ####################
-#############################################
+# -------------------------------------------
+#                CLASSES
+# -------------------------------------------
 
+
+# TODO: implement this to visualize kernel parameters as a grid
 class ParameterVisualizer(object):
+
     def __init__(self, model):
         # also save the names of each layer from model.modules()...
         self.params = list(model.parameters())
+
     def view_params(self, layer, all_layers=False):
         if all_layers:
             pass
         return  # display histogram of features
+
     def min(self, layer, all_layers=False):
         return
+
     def max(self, layer, all_layers=False):
         return
 
-#############################################
-############### FUNCTIONS ###################
-#############################################
+
+# -------------------------------------------
+#                FUNCTIONS
+# -------------------------------------------
 
 def set_plot_size(*new_size):
     """Set the plot size to the given dimensions
@@ -44,23 +50,23 @@ def reset_plot_size():
     set_plot_size(6.0, 4.0)
 
 
-def scatter_categorical(data, labels, color_map, dim=2, plot_size=(12,8), alpha=0.6):
+def scatter_categorical(data, labels, color_map, dim=2, plot_size=(12, 8), alpha=0.6):
     """Scatter plot categorical data in two or three dimensions
 
-	Parameters
-	----------
-	data: np.array
-	labels: iterable
-		labels of each instance
-	color_map: iterable or dict
-		mapping of category label to color
-	dim: int
-		plot dimension, two or three (default=2)
-	plot_size: tuple(int, int)
-		The dimensions of the plot figure (default=(12,8))
-	alpha: float
-		The alpha gradient of the plot (default=0.6)
-	"""
+    Parameters
+    ----------
+    data: np.array
+    labels: iterable
+        Labels of each instance
+    color_map: iterable or dict
+        mapping of category label to color
+    dim: int
+        plot dimension, two or three (default=2)
+    plot_size: tuple(int, int)
+        The dimensions of the plot figure in inches according to matplotlib (default=(12, 8))
+    alpha: float
+        The alpha gradient of the plot(default=0.6)
+    """
 
     # set up the plot
     set_plot_size(*plot_size)
@@ -96,7 +102,7 @@ def scatter_categorical(data, labels, color_map, dim=2, plot_size=(12,8), alpha=
 
 # this should maybe be changed to be more general or wrapped by another function
 # TODO: maybe use torchvision.utils.make_grid for the pytorch case and wrap it with a more generic caller
-def display_images(images, grid_shape, plot_size=(6, 4)):
+def display_images(images, grid_shape=(1, 2), plot_size=(6, 4)):
     """Plot images of pytorch tensors
 
     Parameters
@@ -115,7 +121,7 @@ def display_images(images, grid_shape, plot_size=(6, 4)):
 
     # if there is an extra dimension then remove it
     if len(images[0].size()) == 4:
-        images = [images.squeeze() for img in images]
+        images = [img.squeeze() for img in images]
 
     images = chain(images, [None]*n_leftover_axes)
     for ax, img in zip(axes, images):
