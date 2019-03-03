@@ -133,6 +133,7 @@ def display_images(images, grid_shape=(1, 2), plot_size=(6, 4)):
 
 
 # Print the feature maps produced by the subset of a CNN model
+# TODO: make this use np.ndenumerate instead of reshape
 def compare_feature_maps(image, model, device, grid_shape,
                          plot_size=(12, 8), title='', vmin=-100, vmax=100):
     set_plot_size(*plot_size)
