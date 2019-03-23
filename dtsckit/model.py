@@ -49,6 +49,7 @@ def train_epoch(epoch, model, dataloader, criterion, optimizer, device, print_ra
     return loss_avg.calculate()
 
 
+# TODO: fix 'images' and 'breeds'
 def validate_epoch(epoch, model, dataloader, criterion, device, print_rate=50):
     """Validate the model for an epoch and return the average validation loss
 
@@ -88,7 +89,7 @@ def validate_epoch(epoch, model, dataloader, criterion, device, print_rate=50):
 
 
 def early_stop(train_loader, eval_loader, model, optimizer, criterion, device,
-               print_rate=50, maxepochs=500, check=1, patience=5):
+               check=1, patience=5, maxepochs=500, print_rate=50):
     """Train with early stopping
 
     An early stopping implementation using the 'train' and 'validate' functions.
@@ -110,12 +111,14 @@ def early_stop(train_loader, eval_loader, model, optimizer, criterion, device,
         The loss criterion associated for the model
     device: torch.device
         The device where the model will train
-    maxepochs: int
-        The maximum number of epochs the model can train (default=args.maxepochs)
     check: int
         The number of epochs that must pass to periodically check the validation loss (default=1)
     patience: int
         The number of times that the validation can avoid not reaching a new minimum (default=5)
+    maxepochs: int
+        The maximum number of epochs the model can train (default=args.maxepochs)
+    print_rate: int
+        The print rate for the training and validation losses. Set to -1 for no printing (default=50)
 
     Returns
     -------
