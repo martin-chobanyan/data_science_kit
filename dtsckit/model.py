@@ -35,11 +35,11 @@ def train_epoch(epoch, model, dataloader, criterion, optimizer, device, print_ra
     loss_avg = AverageKeeper()
     model = model.train()
     for i, batch in enumerate(dataloader):
-        images = batch[0].to(device)
-        breeds = batch[1].to(device)
+        batch_x = batch[0].to(device)
+        batch_y = batch[1].to(device)
         optimizer.zero_grad()
-        out = model(images)
-        loss = criterion(out, breeds)
+        out = model(batch_x)
+        loss = criterion(out, batch_y)
         loss.backward()
         optimizer.step()
 
@@ -78,10 +78,10 @@ def validate_epoch(epoch, model, dataloader, criterion, device, print_rate=50):
     model = model.eval()
     with torch.no_grad():
         for i, batch in enumerate(dataloader):
-            images = batch[0].to(device)
-            breeds = batch[1].to(device)
-            out = model(images)
-            loss = criterion(out, breeds)
+            batch_x = batch[0].to(device)
+            batch_y = batch[1].to(device)
+            out = model(batch_x)
+            loss = criterion(out, batch_y)
             loss_avg.add(loss.detach().item())
             if print_stats and i % print_rate == 0:
                 print(f'{i}\t{round(loss_avg.calculate(), 6)}')
