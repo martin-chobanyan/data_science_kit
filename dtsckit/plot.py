@@ -46,8 +46,24 @@ def set_plot_size(*new_size):
 
 
 def reset_plot_size():
-    """Reset the plot size to the matplotlib standard """
+    """Reset the plot size to the matplotlib standard"""
     set_plot_size(6.0, 4.0)
+
+
+class CustomPlotSize(object):
+    """
+    This function defines a `with` statment that applies `set_plot_size` as the entrance
+    and `reset_plot_size` as the exit
+    """
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    def __enter__(self):
+        set_plot_size(self.width, self.height)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        reset_plot_size()
 
 
 def scatter_categorical(data, labels, color_map, dim=2, plot_size=(12, 8), alpha=0.6):
