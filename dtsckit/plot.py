@@ -1,34 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from itertools import chain, product
+from itertools import chain
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
 from torchvision.transforms import ToPILImage
-
-# -------------------------------------------
-#                CLASSES
-# -------------------------------------------
-
-
-# TODO: implement this to visualize kernel parameters as a grid
-class ParameterVisualizer(object):
-
-    def __init__(self, model):
-        # also save the names of each layer from model.modules()...
-        self.params = list(model.parameters())
-
-    def view_params(self, layer, all_layers=False):
-        if all_layers:
-            pass
-        return  # display histogram of features
-
-    def min(self, layer, all_layers=False):
-        return
-
-    def max(self, layer, all_layers=False):
-        return
+from sklearn.metrics import confusion_matrix
+from sklearn.utils.multiclass import unique_labels
 
 
 # -------------------------------------------
@@ -55,6 +34,7 @@ class CustomPlotSize(object):
     This function defines a `with` statment that applies `set_plot_size` as the entrance
     and `reset_plot_size` as the exit
     """
+
     def __init__(self, width, height):
         self.width = width
         self.height = height
@@ -95,8 +75,8 @@ def scatter_categorical(data, labels, color_map, dim=2, plot_size=(12, 8), alpha
         raise ValueError(f'dim must be 2 or 3, not {dim}')
 
     # plot the points for each category
-    unique_labels = list(set(labels))
-    for label in unique_labels:
+    labels_unique = list(set(labels))
+    for label in labels_unique:
         label_idx = np.where(labels == label)[0]
         if dim == 2:
             ax.scatter(data[label_idx, 0],
@@ -139,7 +119,7 @@ def display_images(images, grid_shape=(1, 2), plot_size=(6, 4)):
     if len(images[0].size()) == 4:
         images = [img.squeeze() for img in images]
 
-    images = chain(images, [None]*n_leftover_axes)
+    images = chain(images, [None] * n_leftover_axes)
     for ax, img in zip(axes, images):
         if img is not None:
             ax.imshow(ToPILImage()(img))
@@ -163,7 +143,7 @@ def compare_feature_maps(image, model, device, grid_shape,
         axes = axes.reshape(-1)
 
         # chain the image rasters and fill the remaining spots with Nones
-        n_leftover_axes = len(axes)-len(output)-1
+        n_leftover_axes = len(axes) - len(output) - 1
         image_rasters = chain(output.cpu().squeeze(), [None for _ in range(n_leftover_axes)])
         for i, (axis, img) in enumerate(zip(axes, image_rasters)):
             if img is not None:
@@ -174,33 +154,34 @@ def compare_feature_maps(image, model, device, grid_shape,
     reset_plot_size()
 
 
-def plot_confusion_matrix(cm, classes, normalize=False, title='Confusion matrix', cmap=plt.cm.Blues):
+def plot_confusion_matrix(y_true, y_pred, classes, title=None, cmap=plt.cm.Blues, figsize=(6, 4)):
     """
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
+    This function is based off of the following matplotlib tutorial:
+    https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
     """
-    if normalize:
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-        print("Normalized confusion matrix")
-    else:
-        print('Confusion matrix, without normalization')
+    if not title:
+        title = 'Confusion matrix'
+    cm = confusion_matrix(y_true, y_pred)
+    classes = classes[unique_labels(y_true, y_pred)]
 
-    print(cm)
+    fig, ax = plt.subplots(figsize=figsize)
+    im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
+    ax.figure.colorbar(im, ax=ax)
+    ax.set(xticks=np.arange(cm.shape[1]),
+           yticks=np.arange(cm.shape[0]),
+           xticklabels=classes, yticklabels=classes,
+           title=title,
+           ylabel='True label',
+           xlabel='Predicted label')
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+             rotation_mode="anchor")
 
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
-    plt.yticks(tick_marks, classes)
-
-    fmt = '.2f' if normalize else 'd'
+    fmt = 'd'
     thresh = cm.max() / 2.
-    for i, j in product(range(cm.shape[0]), range(cm.shape[1])):
-        plt.text(j, i, format(cm[i, j], fmt),
-                 horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
-
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
-    plt.tight_layout()
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.text(j, i, format(cm[i, j], fmt),
+                    ha="center", va="center",
+                    color="white" if cm[i, j] > thresh else "black")
+    fig.tight_layout()
+    return ax
