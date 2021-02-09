@@ -28,3 +28,22 @@ def write_pickle(obj, path):
     """
     with open(path, 'wb') as file:
         pickle.dump(obj, file)
+        
+           
+def get_imagenet_label_index(filepath):
+    label_names = []
+    with open(filepath, 'r') as file:
+        for line in file:
+            # clean up the text first
+            line = line.replace('{', '')
+            line = line.replace('}', '')
+            line = line.replace('\n', '')
+            line = line.replace('\s', '')
+            line = line.replace('\'', '')
+            line = line.replace('\"', '')
+
+            # isolate the labels
+            labels = line.split(':')[1:]
+            labels = [label.strip() for label in labels]
+            label_names.append(labels)
+    return label_names
