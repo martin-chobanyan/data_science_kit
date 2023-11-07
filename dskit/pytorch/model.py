@@ -3,7 +3,7 @@
 
 import torch
 from torch.utils.data import random_split
-from dtsckit.metrics import AverageKeeper
+from dskit.metrics import AverageKeeper
 
 
 def train_epoch(epoch, model, dataloader, criterion, optimizer, device, print_rate=50):
